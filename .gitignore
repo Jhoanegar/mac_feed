@@ -7,4 +7,4 @@
 /build
 /captures
 local.properties
-*app.iml
+*.iml
