@@ -4,10 +4,18 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import mac.acatlan.com.macfeed.Adapters.FeedAdapter;
 
 public class FeedActivity extends AppCompatActivity {
 
@@ -16,6 +24,18 @@ public class FeedActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        RecyclerView feedRecycler = (RecyclerView) findViewById(R.id.recycler_feed);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        feedRecycler.setHasFixedSize(true);
+        feedRecycler.setLayoutManager(layoutManager);
+
+        ArrayList<Object> objects = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            objects.add(new Object());
+        }
+        FeedAdapter listAdapter = new FeedAdapter(objects);
+        feedRecycler.setAdapter(listAdapter);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
