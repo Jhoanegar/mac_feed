@@ -4,5 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="color_announcement">#00AEFF</color>
-    <color name="color_divider">#C6C6C6</color>
+    <color name="color_event">#FF9600</color>
+    <color name="color_job">#FF00F6</color>
+    <color name="color_divider">#CDCDCD</color>
 </resources>
