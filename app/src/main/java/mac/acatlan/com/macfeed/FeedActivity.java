@@ -94,15 +94,20 @@ public class FeedActivity extends AppCompatActivity {
     }
 
     private void setAdapter(List<Entry> entries) {
-        FeedAdapter oldAdapter = (FeedAdapter) feedRecycler.getAdapter();
-        if (oldAdapter == null) {
+        FeedAdapter currentAdapter = (FeedAdapter) feedRecycler.getAdapter();
+        if (currentAdapter == null) {
             feedRecycler.setAdapter(new FeedAdapter(this, entries));
             startIntroAnimation();
         } else {
-            oldAdapter.setEntries(entries);
-            oldAdapter.notifyDataSetChanged();
-            Snackbar.make(fab, getString(R.string.feed_updated_successfully), Snackbar.LENGTH_SHORT)
-                    .setAction("Action", null).show();
+            int newEntriesCount = entries.size() - currentAdapter.getItemCount();
+            if (newEntriesCount > 0) {
+                currentAdapter.setEntries(entries);
+                currentAdapter.notifyItemRangeInserted(0, newEntriesCount);
+                feedRecycler.smoothScrollToPosition(0   );
+            } else if (newEntriesCount < 0) {
+                currentAdapter.setEntries(entries);
+                currentAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -184,6 +189,8 @@ public class FeedActivity extends AppCompatActivity {
                             translationY(-getResources().getDimension(R.dimen.top_margin_feed_progressbar) * 2).
                             setDuration(200);
                     setAdapter(entries);
+                    Snackbar.make(fab, getString(R.string.feed_updated_successfully), Snackbar.LENGTH_SHORT)
+                            .setAction("Action", null).show();
                 }
             }, 2000);
         }
