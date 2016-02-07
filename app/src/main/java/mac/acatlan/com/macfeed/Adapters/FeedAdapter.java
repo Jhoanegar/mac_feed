@@ -1,5 +1,6 @@
 package mac.acatlan.com.macfeed.Adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import mac.acatlan.com.macfeed.DAO.Entry;
 import mac.acatlan.com.macfeed.R;
 
 /**
@@ -16,9 +18,15 @@ import mac.acatlan.com.macfeed.R;
  */
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder>{
     private static final String TAG = "FeedAdapter";
-    private List<Object> feedItems;
+    private final Context context;
+    private List<Entry> feedItems;
 
-    public FeedAdapter(List<Object> feedItems) {
+    public FeedAdapter(Context context, List<Entry> feedItems) {
+        this.context = context;
+        this.feedItems = feedItems;
+    }
+
+    public void setEntries(List<Entry> feedItems) {
         this.feedItems = feedItems;
     }
 
@@ -32,10 +40,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     @Override
     public void onBindViewHolder(FeedViewHolder holder, int position) {
-        Log.d(TAG, "Binding: " + position);
-        holder.title.setText("Prueba");
-        holder.summary.setText("Summary");
-        holder.date.setText("01/02/2016");
+        Entry currentEntry = feedItems.get(position);
+        holder.title.setText(currentEntry.getTitle());
+        holder.summary.setText(currentEntry.getSummary());
+        holder.date.setText(currentEntry.getDate());
+        holder.color.setBackgroundColor(currentEntry.getColor(context));
     }
 
     @Override

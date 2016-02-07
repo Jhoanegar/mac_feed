@@ -3,6 +3,12 @@ package mac.acatlan.com.macfeed.DAO;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
 import mac.acatlan.com.macfeed.R;
 
 /**
@@ -77,9 +83,33 @@ public class Entry {
                 colorId = R.color.color_event;
                 break;
             case CATEGORY_JOB:
-                colorId = R.color.color_event;
+                colorId = R.color.color_job;
                 break;
         }
         return ContextCompat.getColor(context, colorId);
+    }
+
+    public static ArrayList<Entry> fromJSONArray(JSONArray arrayEntries) {
+        ArrayList<Entry> outputArray = new ArrayList<>();
+        JSONObject currentObject;
+        /**
+         * Se recorre el array del final al principio esperando que los registros más nuevos
+         * se encuentren al principio
+         */
+        for (int i = arrayEntries.length() - 1; i >= 0 ; i--) {
+            try {
+                currentObject = arrayEntries.getJSONObject(i);
+                Entry newEntry = new Entry();
+                newEntry.setTitle(currentObject.getString("title"));
+                newEntry.setSummary(currentObject.getString("summary"));
+                newEntry.setDate(currentObject.getString("date"));
+                newEntry.setCategory(currentObject.getString("category").charAt(0));
+                outputArray.add(newEntry);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return outputArray;
     }
 }
