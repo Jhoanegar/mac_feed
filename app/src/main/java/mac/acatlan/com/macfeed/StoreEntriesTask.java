@@ -26,7 +26,8 @@ public class StoreEntriesTask<O, V, L> extends AsyncTask<Object, Void, List<Entr
     }
 
     @Override
-    protected List<Entry> doInBackground(Object... params) {
+    protected List<Entry> doInBackground(Object...
+                                                     params) {
         SQLiteOpenHelper dbHelper = (SQLiteOpenHelper) params[0];
         JSONArray responseArray = (JSONArray) params[1];
         List<Entry> entriesArray = Entry.fromJSONArray(responseArray);

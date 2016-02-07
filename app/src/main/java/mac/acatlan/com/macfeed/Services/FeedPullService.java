@@ -39,6 +39,8 @@ public class FeedPullService extends IntentService {
     public static final String BROADCAST_ACTION = FeedPullService.class.getPackage() + ".NEW_ENTRIES_RECEIVED";
     public static final String EXTRA_ENTRIES = FeedPullService.class.getPackage() + "EXTRA_ENTRIES";
 
+    private long entriesCountBeforeUpdate;
+
     public FeedPullService() {
         super(TAG);
     }
@@ -51,6 +53,9 @@ public class FeedPullService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.i(TAG, "ALARMAAAAAAAAA");
         final SQLiteOpenHelper dbHelper = new FeedDbHelper(this);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        entriesCountBeforeUpdate = DatabaseUtils.queryNumEntries(db, EntriesContract.Entry.TABLE_NAME);
+
         JsonArrayRequest request = new JsonArrayRequest(FeedActivity.REMOTE_URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -70,11 +75,11 @@ public class FeedPullService extends IntentService {
     private class StoreNewEntriesTask extends StoreEntriesTask<Object, Void, List<Entry>> {
         @Override
         protected void onPostExecute(List<Entry> entries) {
-            new ReadStoredEntriesTask().execute();
+            new NotifyUserTask().execute();
         }
     }
 
-    private class ReadStoredEntriesTask extends AsyncTask<Object, Void, Object> {
+    private class NotifyUserTask extends AsyncTask<Object, Void, Object> {
 
         @Override
         protected Object doInBackground(Object... params) {
@@ -91,25 +96,31 @@ public class FeedPullService extends IntentService {
                     PendingIntent.FLAG_UPDATE_CURRENT
             );
 
-            long rowCount = DatabaseUtils.queryNumEntries(db, EntriesContract.Entry.TABLE_NAME);
-            String title = FeedPullService.this.getResources().getQuantityString(R.plurals.new_entries_notification_title, (int) rowCount);
-            Notification notification = new Notification.Builder(FeedPullService.this).
-                    setContentTitle(title).
-                    setContentText(title).
-                    setPriority(Notification.PRIORITY_DEFAULT).
-                    setDefaults(Notification.DEFAULT_ALL).
-                    setAutoCancel(true).
-                    setSmallIcon(R.drawable.ic_notification_sync).
-                    setContentIntent(resultIntent).
-                    build();
+            long entriesCountAfter = DatabaseUtils.queryNumEntries(db, EntriesContract.Entry.TABLE_NAME);
 
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//            notificationManager.cancelAll();
-//            if (!MyApplication.isRunning) {
-            Log.i(TAG, "NOTIFICAONDOOOOO");
+            if (entriesCountBeforeUpdate < entriesCountAfter) {
+                long newEntriesCount = entriesCountAfter - entriesCountBeforeUpdate;
+                String title = FeedPullService.this.getResources().getQuantityString(
+                        R.plurals.new_entries_notification_title,
+                        (int) newEntriesCount,
+                        (int) newEntriesCount);
+                Notification notification = new Notification.Builder(FeedPullService.this).
+                        setContentTitle(title).
+                        setContentText(title).
+                        setPriority(Notification.PRIORITY_DEFAULT).
+                        setDefaults(Notification.DEFAULT_ALL).
+                        setAutoCancel(true).
+                        setSmallIcon(R.drawable.ic_notification_sync).
+                        setContentIntent(resultIntent).
+                        build();
+
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancelAll();
+                Log.i(TAG, "NOTIFICAONDOOOOO");
                 notificationManager.notify(DEFAULT_NOTIFICATION_ID, notification);
-//            }
+            }
+
             return null;
         }
     }

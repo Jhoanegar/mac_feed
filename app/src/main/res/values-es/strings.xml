@@ -5,7 +5,7 @@
     <string name="item_feed_details">Detalles</string>
     <string name="feed_updated_successfully">Actualización exitosa</string>
     <plurals name="new_entries_notification_title">
-        <item quantity="one">Se encontró %1$d new announcement</item>
-        <item quantity="other">Hay %1$d nuevas notificaciones</item>
+        <item quantity="one">Se encontró %d nuevo anuncio</item>
+        <item quantity="other">Hay %d nuevos anuncios</item>
     </plurals>
 </resources>

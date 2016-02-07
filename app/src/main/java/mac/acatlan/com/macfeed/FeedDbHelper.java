@@ -22,10 +22,10 @@ public class FeedDbHelper extends SQLiteOpenHelper {
         String createDbSql = "" +
                 "CREATE TABLE " + EntriesContract.Entry.TABLE_NAME + "(" +
                 EntriesContract.Entry._ID + " INTEGER PRIMARY KEY," +
-                EntriesContract.Entry.COLUMN_NAME_TITLE + " TEXT UNIQUE," +
+                EntriesContract.Entry.COLUMN_NAME_TITLE + " TEXT," +
                 EntriesContract.Entry.COLUMN_NAME_SUMMARY + " TEXT," +
                 EntriesContract.Entry.COLUMN_NAME_CATEGORY + " TEXT," +
-                EntriesContract.Entry.COLUMN_NAME_DATE + " TEXT)";
+                EntriesContract.Entry.COLUMN_NAME_DATE + " TEXT UNIQUE)";
 
         Log.d(TAG, "OnCreate: " + createDbSql);
         db.execSQL(createDbSql);

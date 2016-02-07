@@ -4,7 +4,7 @@
     <string name="item_feed_details">Details</string>
     <string name="feed_updated_successfully">Updated successfully</string>
     <plurals name="new_entries_notification_title">
-        <item quantity="one">There is %1$d new announcement</item>
-        <item quantity="other">There are %1$d new announcements</item>
+        <item quantity="one">There is %d new announcement</item>
+        <item quantity="other">There are %d new announcements</item>
     </plurals>
 </resources>
