@@ -3,5 +3,6 @@
     <string name="app_name">MacFeed</string>
     <string name="action_settings">Configuración</string>
     <string name="item_feed_details">Detalles</string>
+    <string name="feed_updated_successfully">Actualización exitosa</string>
 
 </resources>

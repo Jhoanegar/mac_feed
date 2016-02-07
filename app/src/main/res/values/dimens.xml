@@ -7,4 +7,5 @@
     <dimen name="line_height_default">2dp</dimen>
     <dimen name="item_feed_horizontal_margin">8dp</dimen>
     <dimen name="item_feed_vertical_margin">8dp</dimen>
+    <dimen name="top_margin_feed_progressbar">16dp</dimen>
 </resources>

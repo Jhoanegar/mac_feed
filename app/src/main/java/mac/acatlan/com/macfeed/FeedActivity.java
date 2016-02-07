@@ -4,8 +4,10 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.widget.ProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,22 +16,17 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import mac.acatlan.com.macfeed.Adapters.FeedAdapter;
 import mac.acatlan.com.macfeed.Contracts.EntriesContract;
@@ -42,6 +39,11 @@ public class FeedActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private FeedDbHelper dbHelper;
     private RecyclerView feedRecycler;
+
+    private FloatingActionButton fab;
+    private ProgressBar feedProgressBar;
+
+    private boolean isUpdating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,22 +58,25 @@ public class FeedActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        feedProgressBar = (ProgressBar) findViewById(R.id.feed_progressbar);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                requestEntries();
             }
         });
 
         dbHelper = new FeedDbHelper(this);
-        requestQueue = initializeRequestQueue();
+        requestQueue = Volley.newRequestQueue(this);
+        requestEntries();
 
     }
 
-    private RequestQueue initializeRequestQueue() {
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
+    private void requestEntries() {
+        if (isUpdating)
+            return;
         JsonArrayRequest request = new JsonArrayRequest(REMOTE_URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -86,17 +91,30 @@ public class FeedActivity extends AppCompatActivity {
         });
 
         requestQueue.add(request);
-        return requestQueue;
     }
 
     private void setAdapter(List<Entry> entries) {
         FeedAdapter oldAdapter = (FeedAdapter) feedRecycler.getAdapter();
         if (oldAdapter == null) {
             feedRecycler.setAdapter(new FeedAdapter(this, entries));
+            startIntroAnimation();
         } else {
             oldAdapter.setEntries(entries);
             oldAdapter.notifyDataSetChanged();
+            Snackbar.make(fab, getString(R.string.feed_updated_successfully), Snackbar.LENGTH_SHORT)
+                    .setAction("Action", null).show();
         }
+    }
+
+    private void startIntroAnimation() {
+        feedRecycler.setTranslationY(50);
+        feedRecycler.setAlpha(0f);
+        feedRecycler.animate()
+                .translationY(0)
+                .setDuration(400)
+                .alpha(1f)
+                .setInterpolator(new AccelerateDecelerateInterpolator())
+                .start();
     }
 
     @Override
@@ -123,6 +141,17 @@ public class FeedActivity extends AppCompatActivity {
     private class StoreEntries extends AsyncTask<Object, Void, List<Entry>> {
 
         @Override
+        protected void onPreExecute() {
+            isUpdating = true;
+            feedProgressBar.setAlpha(0);
+            feedProgressBar.setTranslationY(-getResources().getDimensionPixelOffset(R.dimen.top_margin_feed_progressbar) * 2);
+            feedProgressBar.animate().
+                    translationY(0).
+                    alpha(1).
+                    setDuration(200);
+        }
+
+        @Override
         protected List<Entry> doInBackground(Object... params) {
             JSONArray responseArray = (JSONArray) params[0];
             List<Entry> entriesArray = Entry.fromJSONArray(responseArray);
@@ -145,8 +174,18 @@ public class FeedActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<Entry> entries) {
-            setAdapter(entries);
+        protected void onPostExecute(final List<Entry> entries) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    isUpdating = false;
+                    feedProgressBar.animate().
+                            alpha(0).
+                            translationY(-getResources().getDimension(R.dimen.top_margin_feed_progressbar) * 2).
+                            setDuration(200);
+                    setAdapter(entries);
+                }
+            }, 2000);
         }
     }
 }

@@ -32,23 +32,37 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/recycler_feed"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/item_feed"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         >
-
-    </android.support.v7.widget.RecyclerView>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_feed"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_feed"
+        />
+        <ProgressBar
+            android:id="@+id/feed_progressbar"
+            android:layout_marginTop="@dimen/top_margin_feed_progressbar"
+            android:layout_gravity="top|center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyle"
+            />
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_dialog_email"
+        android:src="@drawable/ic_notification_sync"
+        android:scaleType="center"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end" />
+
+
 
 </android.support.design.widget.CoordinatorLayout>
