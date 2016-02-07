@@ -1,10 +1,11 @@
 package mac.acatlan.com.macfeed;
 
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.widget.ProgressBar;
@@ -29,12 +30,15 @@ import org.json.JSONArray;
 import java.util.List;
 
 import mac.acatlan.com.macfeed.Adapters.FeedAdapter;
-import mac.acatlan.com.macfeed.Contracts.EntriesContract;
 import mac.acatlan.com.macfeed.DAO.Entry;
+import mac.acatlan.com.macfeed.Services.FeedPullService;
+import mac.acatlan.com.macfeed.Services.MyApplication;
 
 public class FeedActivity extends AppCompatActivity {
     private static final String TAG = "FeedActivity";
-    private static final String REMOTE_URL = "http://192.168.0.2:3000/api/entries";
+    public static final String REMOTE_URL = "http://192.168.0.2:3000/api/entries";
+
+    public static final String EXTRA_READ_FROM_DATABASE_ON_CREATE = "EXTRA_READ_FROM_DB_ON_CREATE";
 
     private RequestQueue requestQueue;
     private FeedDbHelper dbHelper;
@@ -42,6 +46,8 @@ public class FeedActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
     private ProgressBar feedProgressBar;
+
+    private PendingIntent alarmIntent;
 
     private boolean isUpdating = false;
 
@@ -68,10 +74,36 @@ public class FeedActivity extends AppCompatActivity {
             }
         });
 
+        if (alarmIntent == null) {
+            Intent intent = new Intent(this, FeedPullService.class);
+            alarmIntent = PendingIntent.getService(this, 0, intent, 0);
+        }
+
         dbHelper = new FeedDbHelper(this);
         requestQueue = Volley.newRequestQueue(this);
         requestEntries();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MyApplication.isRunning = true;
+        if ( alarmIntent != null ) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarmManager.cancel(alarmIntent);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MyApplication.isRunning = false;
+        if (alarmIntent != null) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            // Programa la alarma para que se dispare en un minuto cada 15 minutos
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + 60 * 1000, 60 * 1000, alarmIntent);
+        }
     }
 
     private void requestEntries() {
@@ -143,7 +175,7 @@ public class FeedActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class StoreEntries extends StoreEntriesTask {
+    private class StoreEntries extends StoreEntriesTask<Object, Void, List<Entry>> {
         @Override
         protected void onPreExecute() {
             isUpdating = true;

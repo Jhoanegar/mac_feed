@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import mac.acatlan.com.macfeed.R;
@@ -14,7 +15,9 @@ import mac.acatlan.com.macfeed.R;
 /**
  * Created by jhoan on 2/6/16.
  */
-public class Entry {
+public class Entry implements Serializable {
+    private static final long serialVersionUID = 0L;
+
     public static final char CATEGORY_ANNOUNCEMENT = 'A';
     public static final char CATEGORY_EVENT = 'E';
     public static final char CATEGORY_JOB = 'J';

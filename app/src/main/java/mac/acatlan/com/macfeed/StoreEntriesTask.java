@@ -19,7 +19,7 @@ import mac.acatlan.com.macfeed.DAO.Entry;
 /**
  * Created by jhoan on 2/7/16.
  */
-public class StoreEntriesTask extends AsyncTask<Object, Void, List<Entry>> {
+public class StoreEntriesTask<O, V, L> extends AsyncTask<Object, Void, List<Entry>> {
     @Override
     protected void onPreExecute() {
 

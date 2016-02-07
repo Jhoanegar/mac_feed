@@ -4,5 +4,8 @@
     <string name="action_settings">Configuración</string>
     <string name="item_feed_details">Detalles</string>
     <string name="feed_updated_successfully">Actualización exitosa</string>
-
+    <plurals name="new_entries_notification_title">
+        <item quantity="one">Se encontró %1$d new announcement</item>
+        <item quantity="other">Hay %1$d nuevas notificaciones</item>
+    </plurals>
 </resources>
