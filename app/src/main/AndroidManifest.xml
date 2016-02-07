@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="mac.acatlan.com.macfeed">
 
     <uses-permission
@@ -12,7 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
+        <service android:name=".Services.FeedPullService"
+            android:exported="false"
+            tools:ignore="InnerclassSeparator" />
 
         <activity
             android:name=".FeedActivity"

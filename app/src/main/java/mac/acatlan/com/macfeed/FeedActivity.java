@@ -81,7 +81,7 @@ public class FeedActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONArray response) {
                 Log.d(TAG, response.toString());
-                new StoreEntries().execute(response);
+                new StoreEntries().execute(dbHelper, response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -143,8 +143,7 @@ public class FeedActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class StoreEntries extends AsyncTask<Object, Void, List<Entry>> {
-
+    private class StoreEntries extends StoreEntriesTask {
         @Override
         protected void onPreExecute() {
             isUpdating = true;
@@ -154,28 +153,6 @@ public class FeedActivity extends AppCompatActivity {
                     translationY(0).
                     alpha(1).
                     setDuration(200);
-        }
-
-        @Override
-        protected List<Entry> doInBackground(Object... params) {
-            JSONArray responseArray = (JSONArray) params[0];
-            List<Entry> entriesArray = Entry.fromJSONArray(responseArray);
-
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
-            Entry currentEntry;
-            for (int i = 0; i < entriesArray.size(); i++) {
-                currentEntry = entriesArray.get(i);
-                values.put(EntriesContract.Entry.COLUMN_NAME_TITLE, currentEntry.getTitle());
-                values.put(EntriesContract.Entry.COLUMN_NAME_SUMMARY, currentEntry.getSummary());
-                values.put(EntriesContract.Entry.COLUMN_NAME_DATE, currentEntry.getDate());
-                values.put(EntriesContract.Entry.COLUMN_NAME_CATEGORY, String.valueOf(currentEntry.getCategory()));
-                Log.d(TAG, "Inserting: " + currentEntry.getTitle());
-                db.insertWithOnConflict(EntriesContract.Entry.TABLE_NAME, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-            }
-            db.close();
-            return entriesArray;
         }
 
         @Override
