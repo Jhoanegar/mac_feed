@@ -10,7 +10,6 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -23,8 +22,7 @@ import org.json.JSONArray;
 
 import java.util.List;
 
-import mac.acatlan.com.macfeed.Contracts.EntriesContract;
-import mac.acatlan.com.macfeed.DAO.Entry;
+import mac.acatlan.com.macfeed.Contracts.FeedContract;
 import mac.acatlan.com.macfeed.FeedActivity;
 import mac.acatlan.com.macfeed.FeedDbHelper;
 import mac.acatlan.com.macfeed.R;
@@ -54,7 +52,7 @@ public class FeedPullService extends IntentService {
         Log.i(TAG, "ALARMAAAAAAAAA");
         final SQLiteOpenHelper dbHelper = new FeedDbHelper(this);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        entriesCountBeforeUpdate = DatabaseUtils.queryNumEntries(db, EntriesContract.Entry.TABLE_NAME);
+        entriesCountBeforeUpdate = DatabaseUtils.queryNumEntries(db, FeedContract.AvisoContract.TABLE_NAME);
 
         JsonArrayRequest request = new JsonArrayRequest(FeedActivity.REMOTE_URL, new Response.Listener<JSONArray>() {
             @Override
@@ -72,9 +70,9 @@ public class FeedPullService extends IntentService {
         requestQueue.add(request);
     }
 
-    private class StoreNewEntriesTask extends StoreEntriesTask<Object, Void, List<Entry>> {
+    private class StoreNewEntriesTask extends StoreEntriesTask<Object, Void, List<mac.acatlan.com.macfeed.DAO.Aviso>> {
         @Override
-        protected void onPostExecute(List<Entry> entries) {
+        protected void onPostExecute(List<mac.acatlan.com.macfeed.DAO.Aviso> entries) {
             new NotifyUserTask().execute();
         }
     }
@@ -96,7 +94,7 @@ public class FeedPullService extends IntentService {
                     PendingIntent.FLAG_UPDATE_CURRENT
             );
 
-            long entriesCountAfter = DatabaseUtils.queryNumEntries(db, EntriesContract.Entry.TABLE_NAME);
+            long entriesCountAfter = DatabaseUtils.queryNumEntries(db, FeedContract.AvisoContract.TABLE_NAME);
 
             if (entriesCountBeforeUpdate < entriesCountAfter) {
                 long newEntriesCount = entriesCountAfter - entriesCountBeforeUpdate;

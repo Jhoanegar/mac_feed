@@ -19,24 +19,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.List;
 
 import mac.acatlan.com.macfeed.Adapters.FeedAdapter;
-import mac.acatlan.com.macfeed.DAO.Entry;
+import mac.acatlan.com.macfeed.DAO.Aviso;
 import mac.acatlan.com.macfeed.Services.FeedPullService;
 import mac.acatlan.com.macfeed.Services.MyApplication;
 
 public class FeedActivity extends AppCompatActivity {
     private static final String TAG = "FeedActivity";
-    public static final String REMOTE_URL = "http://192.168.0.2:3000/api/entries";
+    public static final String REMOTE_URL = "http://192.168.56.1:3000/data";
 
     public static final String EXTRA_READ_FROM_DATABASE_ON_CREATE = "EXTRA_READ_FROM_DB_ON_CREATE";
 
@@ -109,9 +112,10 @@ public class FeedActivity extends AppCompatActivity {
     private void requestEntries() {
         if (isUpdating)
             return;
-        JsonArrayRequest request = new JsonArrayRequest(REMOTE_URL, new Response.Listener<JSONArray>() {
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,REMOTE_URL, null, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONArray response) {
+            public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
                 new StoreEntries().execute(dbHelper, response);
             }
@@ -125,7 +129,7 @@ public class FeedActivity extends AppCompatActivity {
         requestQueue.add(request);
     }
 
-    private void setAdapter(List<Entry> entries) {
+    private void setAdapter(List<Aviso> entries) {
         FeedAdapter currentAdapter = (FeedAdapter) feedRecycler.getAdapter();
         if (currentAdapter == null) {
             feedRecycler.setAdapter(new FeedAdapter(this, entries));
@@ -175,7 +179,7 @@ public class FeedActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class StoreEntries extends StoreEntriesTask<Object, Void, List<Entry>> {
+    private class StoreEntries extends StoreEntriesTask<Object, Void, List<Aviso>> {
         @Override
         protected void onPreExecute() {
             isUpdating = true;
@@ -188,7 +192,7 @@ public class FeedActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(final List<Entry> entries) {
+        protected void onPostExecute(final List<Aviso> entries) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

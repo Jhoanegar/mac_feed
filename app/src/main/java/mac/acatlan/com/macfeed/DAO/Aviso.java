@@ -3,19 +3,22 @@ package mac.acatlan.com.macfeed.DAO;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 
+import org.joda.time.DateTime;
+import org.joda.time.Instant;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import mac.acatlan.com.macfeed.R;
 
 /**
  * Created by jhoan on 2/6/16.
  */
-public class Entry implements Serializable {
+public class Aviso implements Serializable {
     private static final long serialVersionUID = 0L;
 
     public static final char CATEGORY_ANNOUNCEMENT = 'A';
@@ -26,6 +29,7 @@ public class Entry implements Serializable {
     private String title;
     private String summary;
     private String date;
+    private List<Adjunto> adjuntos;
     private int color;
     private char category;
 
@@ -57,8 +61,21 @@ public class Entry implements Serializable {
         return date;
     }
 
+    public String getFormattedDate() {
+        DateTime date = new DateTime(this.date);
+        return date.toString("dd/MM/yyyy HH:mm:ss");
+    }
+
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public List<Adjunto> getAdjuntos() {
+        return adjuntos;
+    }
+
+    public void setAdjuntos(List<Adjunto> adjuntos) {
+        this.adjuntos = adjuntos;
     }
 
     public char getCategory() {
@@ -92,9 +109,14 @@ public class Entry implements Serializable {
         return ContextCompat.getColor(context, colorId);
     }
 
-    public static ArrayList<Entry> fromJSONArray(JSONArray arrayEntries) {
-        ArrayList<Entry> outputArray = new ArrayList<>();
+    public boolean hasAdjuntos() {
+        return this.adjuntos.size() > 0;
+    }
+
+    public static ArrayList<Aviso> fromJSONArray(JSONArray arrayEntries) {
+        ArrayList<Aviso> outputArray = new ArrayList<>();
         JSONObject currentObject;
+        JSONObject currentAdjunto;
         /**
          * Se recorre el array del final al principio esperando que los registros más nuevos
          * se encuentren al principio
@@ -102,12 +124,17 @@ public class Entry implements Serializable {
         for (int i = arrayEntries.length() - 1; i >= 0 ; i--) {
             try {
                 currentObject = arrayEntries.getJSONObject(i);
-                Entry newEntry = new Entry();
-                newEntry.setTitle(currentObject.getString("title"));
-                newEntry.setSummary(currentObject.getString("summary"));
-                newEntry.setDate(currentObject.getString("date"));
-                newEntry.setCategory(currentObject.getString("category").charAt(0));
-                outputArray.add(newEntry);
+                Aviso newAviso = new Aviso();
+                newAviso.setId(currentObject.getInt("id"));
+                newAviso.setTitle(currentObject.getString("titulo"));
+                newAviso.setSummary(currentObject.getString("descripcion"));
+                newAviso.setDate(currentObject.getString("fecha_creacion"));
+                newAviso.setCategory('A');
+                if (currentObject.has("adjuntos")) {
+                    JSONArray adjuntos = currentObject.getJSONArray("adjuntos");
+                    newAviso.setAdjuntos(Adjunto.fromJSONArray(adjuntos));
+                }
+                outputArray.add(newAviso);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

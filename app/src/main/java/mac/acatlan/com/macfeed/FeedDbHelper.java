@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import mac.acatlan.com.macfeed.Contracts.EntriesContract;
+import mac.acatlan.com.macfeed.Contracts.FeedContract;
 
 /**
  * Created by jhoan on 2/6/16.
@@ -14,25 +14,34 @@ public class FeedDbHelper extends SQLiteOpenHelper {
     public static final String TAG = "FeedDbHelper";
 
     public FeedDbHelper(Context context) {
-        super(context, EntriesContract.DATABASE_NAME, null, EntriesContract.DATABASE_VERSION);
+        super(context, FeedContract.DATABASE_NAME, null, FeedContract.DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createDbSql = "" +
-                "CREATE TABLE " + EntriesContract.Entry.TABLE_NAME + "(" +
-                EntriesContract.Entry._ID + " INTEGER PRIMARY KEY," +
-                EntriesContract.Entry.COLUMN_NAME_TITLE + " TEXT," +
-                EntriesContract.Entry.COLUMN_NAME_SUMMARY + " TEXT," +
-                EntriesContract.Entry.COLUMN_NAME_CATEGORY + " TEXT," +
-                EntriesContract.Entry.COLUMN_NAME_DATE + " TEXT UNIQUE)";
+        String createAvisoDbSql = "" +
+                "CREATE TABLE " + FeedContract.AvisoContract.TABLE_NAME + "(" +
+                FeedContract.AvisoContract._ID + " INTEGER PRIMARY KEY," +
+                FeedContract.AvisoContract.COLUMN_NAME_TITULO + " TEXT," +
+                FeedContract.AvisoContract.COLUMN_NAME_DESCRIPCION + " TEXT," +
+                FeedContract.AvisoContract.COLUMN_NAME_TIPO + " TEXT," +
+                FeedContract.AvisoContract.COLUMN_NAME_FECHA_CREACION + " TEXT UNIQUE);";
 
-        Log.d(TAG, "OnCreate: " + createDbSql);
-        db.execSQL(createDbSql);
+        String createAdjuntoDbSql = "" +
+                "CREATE TABLE " + FeedContract.AdjuntoContract.TABLE_NAME + "(" +
+                FeedContract.AdjuntoContract._ID + " INTEGER PRIMARY KEY," +
+                FeedContract.AdjuntoContract.COLUMN_NAME_TITULO + " TEXT," +
+                FeedContract.AdjuntoContract.COLUMN_NAME_LINK + " TEXT," +
+                FeedContract.AdjuntoContract.COLUMN_NAME_AVISO_ID + " INTEGER);";
+
+        Log.d(TAG, "OnCreate: " + createAvisoDbSql);
+        Log.d(TAG, "OnCreate: " + createAdjuntoDbSql);
+        db.execSQL(createAvisoDbSql);
+        db.execSQL(createAdjuntoDbSql);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + EntriesContract.Entry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + FeedContract.AvisoContract.TABLE_NAME);
     }
 }

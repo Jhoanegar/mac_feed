@@ -8,4 +8,5 @@
         <item quantity="one">Se encontró %d nuevo anuncio</item>
         <item quantity="other">Hay %d nuevos anuncios</item>
     </plurals>
+    <string name="item_feed_share">Compartir</string>
 </resources>

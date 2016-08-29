@@ -7,4 +7,5 @@
         <item quantity="one">There is %d new announcement</item>
         <item quantity="other">There are %d new announcements</item>
     </plurals>
+    <string name="item_feed_share">Share</string>
 </resources>

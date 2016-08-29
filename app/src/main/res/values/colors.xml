@@ -6,5 +6,6 @@
     <color name="color_announcement">#00AEFF</color>
     <color name="color_event">#FF9600</color>
     <color name="color_job">#FF00F6</color>
+    <color name="color_attachment_bg">#3F51B5</color>
     <color name="color_divider">#CDCDCD</color>
 </resources>
